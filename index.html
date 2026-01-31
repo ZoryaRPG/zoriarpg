@@ -4,60 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zoria RPG — Official Hytale Project</title>
+    
+    <meta name="description" content="Найкращий український RPG проект у світі Hytale. Приєднуйся до спільноти Zoria RPG!">
+    <meta property="og:title" content="Zoria RPG — Official Hytale Project">
+    <meta property="og:image" content="logo.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --neon: #3b82f6; --neon-rgb: 59, 130, 246; }
-        body { font-family: 'Montserrat', sans-serif; background: #020205; color: white; margin: 0; overflow-x: hidden; cursor: crosshair; }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: #020205; 
+            color: white; 
+            margin: 0; 
+            overflow-x: hidden; 
+            cursor: crosshair;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* Фонова система */
-        .bg-layer { position: fixed; inset: 0; z-index: -5; background: url('fon.png') center/cover; filter: blur(8px) brightness(0.3); transform: scale(1.05); transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .vignette { position: fixed; inset: 0; z-index: -4; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.95) 100%); }
-        
-        /* Швидка та сильна пульсація логотипу */
-        @keyframes fast-pulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.4)); }
-            50% { transform: scale(1.15); filter: drop-shadow(0 0 60px rgba(59, 130, 246, 0.8)); }
+        .bg-layer { 
+            position: fixed; inset: -10%; z-index: -5; 
+            background: url('fon.png') center/cover; 
+            filter: blur(8px) brightness(0.3); 
+            animation: bg-pan 25s ease-in-out infinite alternate;
+            transition: filter 0.8s ease;
+            will-change: transform;
         }
-        .hero-logo { width: 280px; animation: fast-pulse 3s ease-in-out infinite; transition: 0.5s; }
-        .hero-logo:hover { animation-play-state: paused; transform: scale(1.2); }
+        @keyframes bg-pan {
+            from { transform: scale(1.05) translate(-1%, -1%); }
+            to { transform: scale(1.15) translate(1%, 1%); }
+        }
 
-        /* Заголовок: Білий з RGB-неоном */
+        .fog-container { position: fixed; inset: 0; z-index: -3; pointer-events: none; }
+        .fog {
+            position: absolute; inset: 0;
+            background: url('https://www.transparenttextures.com/patterns/clouds.png');
+            opacity: 0.12;
+        }
+        .fog-1 { animation: fog-move 50s linear infinite; }
+        .fog-2 { animation: fog-move 80s linear infinite reverse; opacity: 0.06; }
+        @keyframes fog-move { from { transform: translateX(0); } to { transform: translateX(-1000px); } }
+
+        .vignette { position: fixed; inset: 0; z-index: -4; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.95) 100%); }
+        body:has(.interactive:hover) .bg-layer { filter: blur(12px) brightness(0.15); }
+
+        .nav-logo { font-size: 1.5rem; font-weight: 900; font-style: italic; letter-spacing: -0.05em; padding: 15px; white-space: nowrap; }
+
+        @keyframes extreme-shake {
+            0%, 100% { transform: translate(0,0); filter: none; }
+            20% { transform: translate(-8px, 4px); filter: drop-shadow(4px 0 0 #ff0000) drop-shadow(-4px 0 0 #00ffff); }
+            40% { transform: translate(8px, -4px); filter: drop-shadow(-4px 0 0 #ff0000) drop-shadow(4px 0 0 #00ffff); }
+            60% { transform: translate(-10px, 2px); }
+            80% { transform: translate(10px, -2px); }
+        }
+        .apply-shake { animation: extreme-shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .logo-container { perspective: 1000px; }
+        .hero-logo { 
+            width: 280px; transition: transform 0.15s ease-out, filter 0.3s; cursor: pointer;
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6)) brightness(1.1);
+            user-select: none;
+        }
+
         .neon-title {
-            font-size: clamp(3rem, 12vw, 7.5rem);
-            font-weight: 900; color: #ffffff;
-            text-transform: uppercase; position: relative;
-            text-shadow: 0 0 15px rgba(255,255,255,0.3); line-height: 0.9;
+            font-size: clamp(3rem, 12vw, 7.5rem); font-weight: 900; 
+            text-transform: uppercase; position: relative; line-height: 1.2;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3); 
+            user-select: none;
         }
         .neon-title::after {
-            content: 'ZORIA RPG';
-            position: absolute; inset: 0;
+            content: 'ZORIA RPG'; position: absolute; inset: 0;
             -webkit-text-stroke: 6px transparent;
             background: linear-gradient(90deg, #ff0000, #00ff00, #00ffff, #ff0000, #ff00ff);
-            background-size: 250% auto;
-            -webkit-background-clip: text; background-clip: text;
+            background-size: 250% auto; -webkit-background-clip: text; background-clip: text;
             filter: blur(6px); animation: rgb-move 3s linear infinite; z-index: -1;
         }
         @keyframes rgb-move { to { background-position: 250% center; } }
 
-        /* Інтерактивні елементи */
-        .interactive { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .interactive:active { transform: scale(0.92); }
-
-        .btn-main { background: var(--neon); border-radius: 18px; font-weight: 900; text-transform: uppercase; box-shadow: 0 0 20px rgba(var(--neon-rgb), 0.3); }
-        .btn-main:hover { box-shadow: 0 0 45px rgba(var(--neon-rgb), 0.7); transform: translateY(-5px) scale(1.05); }
-
-        .btn-discord { background: #5865F2; }
-        .btn-discord:hover { box-shadow: 0 0 40px rgba(88, 101, 242, 0.6); }
+        .interactive { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; user-select: none; }
+        .btn-main { background: var(--neon); border-radius: 18px; font-weight: 900; box-shadow: 0 0 20px rgba(var(--neon-rgb), 0.3); }
+        
+        .disabled-btn {
+            filter: grayscale(1) opacity(0.4); cursor: not-allowed !important;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1) !important;
+        }
+        .disabled-btn:hover::after {
+            content: 'СКОРО...'; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+            font-size: 9px; font-weight: 900; color: #3b82f6; letter-spacing: 2px;
+            animation: fadeIn 0.2s forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .neon-card {
             background: rgba(15, 15, 25, 0.5); backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px;
         }
-        .neon-card:hover { border-color: var(--neon); box-shadow: 0 0 50px rgba(var(--neon-rgb), 0.2); }
+        .neon-card:hover { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 30px rgba(59, 130, 246, 0.1); }
 
-        /* Ефект Ripple */
-        .ripple { position: absolute; background: rgba(255, 255, 255, 0.5); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; animation: ripple-anim 0.6s ease-out; }
+        /* ГАЛЕРЕЯ-СЛАЙДЕР */
+        .slider-container { 
+            position: relative; width: 100%; max-width: 1100px; margin: 0 auto; 
+            overflow: hidden; border-radius: 32px; border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            user-select: none;
+        }
+        .slider-track { display: flex; transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1); will-change: transform; }
+        .slide { min-width: 100%; aspect-ratio: 16/9; overflow: hidden; position: relative; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; pointer-events: none; }
+        .slide:hover img { transform: scale(1.05); }
+        
+        .slider-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.5); color: white; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; z-index: 10; border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s; backdrop-filter: blur(5px);
+        }
+        .slider-btn:hover {
+            scale: 1.1; border-color: #3b82f6;
+            box-shadow: 0 0 20px #3b82f6;
+            animation: rgb-btn-anim 2s linear infinite;
+        }
+        @keyframes rgb-btn-anim { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        .prev { left: 20px; } .next { right: 20px; }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .copy-progress { position: absolute; bottom: 0; left: 0; height: 4px; background: #10b981; width: 0; transition: width 2s linear; }
+        .ripple { position: absolute; background: rgba(255, 255, 255, 0.5); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; animation: ripple-anim 0.6s ease-out; z-index: 20; }
         @keyframes ripple-anim { from { width: 0; height: 0; opacity: 0.6; } to { width: 600px; height: 600px; opacity: 0; } }
 
         canvas { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
@@ -66,151 +144,298 @@
 <body>
 
     <div class="bg-layer"></div>
+    <div class="fog-container">
+        <div class="fog fog-1"></div>
+        <div class="fog fog-2"></div>
+    </div>
     <div class="vignette"></div>
     <canvas id="magic-canvas"></canvas>
 
-    <nav class="w-full max-w-7xl mx-auto flex justify-between items-center p-8 z-50 relative">
-        <div class="text-2xl font-black italic tracking-tighter interactive cursor-default select-none">ZORIA<span class="text-blue-500">RPG</span></div>
-        <a href="https://discord.gg/psWHbtjcXf" target="_blank" class="interactive btn-discord px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest">Discord</a>
-    </nav>
+    <div id="shake-container">
+        <nav class="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row justify-between items-center p-6 md:p-8 z-50 relative gap-6">
+            <div class="nav-logo interactive cursor-default select-none">ZORIA<span class="text-blue-500">RPG</span></div>
+            <div class="flex flex-wrap justify-center items-center gap-3 md:gap-4">
+                <a href="https://discord.gg/psWHbtjcXf" target="_blank" class="interactive px-5 py-3 bg-[#5865F2] rounded-xl font-bold text-xs uppercase flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(88,101,242,0.3)]">
+                    <span>Discord</span>
+                </a>
+                <a href="https://www.youtube.com/@HytaleZoryaRPGUA" target="_blank" class="interactive px-5 py-3 bg-[#FF0000] rounded-xl font-bold text-xs uppercase flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,0,0,0.3)]">
+                    <span>YouTube</span>
+                </a>
+                <a href="https://www.tiktok.com/@uazoriahytailrpg?_r=1&_t=ZS-93XZ7gY37ep" target="_blank" class="interactive px-5 py-3 bg-[#000000] border border-[#ff0050] rounded-xl font-bold text-xs uppercase flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,0,80,0.2)]">
+                    <span style="text-shadow: 1px 1px #ff0050, -1px -1px #00f2ea;">TikTok</span>
+                </a>
+                <a href="https://t.me/ua_zoriarpg_hytail" target="_blank" class="interactive px-5 py-3 bg-[#24A1DE] rounded-xl font-bold text-xs uppercase flex items-center gap-2 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(36,161,222,0.3)]">
+                    <span>Telegram</span>
+                </a>
+                <div class="interactive disabled-btn px-6 md:px-8 py-3 md:py-4 bg-white/5 border-2 border-blue-500/30 rounded-2xl font-black text-sm uppercase text-blue-400 lg:ml-4 lg:scale-110 shadow-[0_0_20px_rgba(59,130,246,0.1)] text-center">Особистий кабінет</div>
+            </div>
+        </nav>
 
-    <main class="flex flex-col items-center text-center px-4 mt-6 relative z-10">
-        <div class="mb-10">
-            <img src="logo.png" alt="Logo" class="hero-logo">
-        </div>
-        
-        <h2 class="text-[10px] md:text-xs font-black tracking-[1.5em] text-blue-500 mb-6 opacity-80 uppercase">Ukrainian Hytale Project</h2>
-        <h1 class="neon-title mb-24 select-none">ZORIA RPG</h1>
+        <main class="flex flex-col items-center text-center px-4 mt-6 relative z-10">
+            <div class="mb-10 logo-container">
+                <img src="logo.png" alt="Zoria RPG Logo" class="hero-logo" id="logo-shake-btn">
+            </div>
+            <h2 class="text-[10px] md:text-xs font-black tracking-[1.5em] text-blue-500 mb-6 opacity-80 uppercase pl-[1.5em]">Ukrainian Hytale Project</h2>
+            <h1 class="neon-title mb-16 md:mb-24 select-none">ZORIA RPG</h1>
 
-        <div class="w-full max-w-2xl space-y-6 mb-32">
-            <div class="neon-card interactive p-10 flex flex-col md:flex-row justify-between items-center gap-8 px-14">
-                <div class="text-left">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
-                        <p class="text-[10px] uppercase text-gray-400 tracking-[0.2em] font-black italic">Server Status: <span class="text-green-400">Online</span></p>
+            <div class="w-full max-w-2xl space-y-6 mb-32 reveal active">
+                <div class="neon-card interactive p-8 md:p-10 flex flex-col md:flex-row justify-between items-center gap-8 px-8 md:px-14">
+                    <div class="text-center md:text-left">
+                        <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                            <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
+                            <p class="text-[10px] uppercase text-gray-400 font-black italic">Server Status: <span class="text-green-400">Online</span></p>
+                        </div>
+                        <span class="text-lg md:text-2xl font-mono font-black italic break-all">zoriarpg.ggwp.cc:15510</span>
                     </div>
-                    <span class="text-xl md:text-2xl font-mono font-black text-white italic tracking-wider">zoriarpg.ggwp.cc:15510</span>
+                    <button onclick="copyIp(event)" class="interactive btn-main px-10 py-5 text-xs text-white overflow-hidden w-full md:w-auto">
+                        <span class="relative z-10">КОПІЮВАТИ IP</span>
+                        <div class="copy-progress" id="progress-bar"></div>
+                    </button>
                 </div>
-                <button onclick="copyIp(event)" class="interactive btn-main px-10 py-5 text-xs">КОПІЮВАТИ IP</button>
+                <a href="http://zoriarpg.ggwp.cc:15510/" id="btn-map" target="_blank" class="interactive w-full neon-card p-6 md:p-8 flex items-center justify-center gap-5 group">
+                    <span class="text-2xl md:text-3xl group-hover:rotate-[360deg] transition-transform duration-700">🌍</span>
+                    <span class="text-xs md:text-sm font-black uppercase tracking-[0.5em] group-hover:text-blue-400">Відкрити онлайн-мапу</span>
+                </a>
             </div>
 
-            <a href="http://zoriarpg.ggwp.cc:15510/" target="_blank" class="interactive w-full neon-card p-6 flex items-center justify-center gap-5 group">
-                <span class="text-2xl group-hover:rotate-[360deg] transition-transform duration-1000">🌍</span>
-                <span class="text-sm font-black uppercase tracking-[0.5em] group-hover:text-blue-400 transition-colors">Відкрити онлайн-мапу</span>
-            </a>
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl w-full mb-32 reveal">
+                <div class="neon-card interactive p-8 lg:p-12 text-left group">
+                    <div class="text-4xl lg:text-5xl mb-6 lg:mb-8 group-hover:scale-110 transition-transform">🇺🇦</div>
+                    <h3 class="text-lg lg:text-xl font-black mb-4 text-blue-500 uppercase">UA Community</h3>
+                    <p class="text-gray-400 text-sm">Повне занурення в українську атмосферу Hytale.</p>
+                </div>
+                <div class="neon-card interactive p-8 lg:p-12 text-left group">
+                    <div class="text-4xl lg:text-5xl mb-6 lg:mb-8 group-hover:scale-110 transition-transform">⚔️</div>
+                    <h3 class="text-lg lg:text-xl font-black mb-4 text-purple-500 uppercase">RPG World</h3>
+                    <p class="text-gray-400 text-sm">Унікальні боси, квести та магія чекають на тебе.</p>
+                </div>
+                <div class="neon-card interactive p-8 lg:p-12 text-left group">
+                    <div class="text-4xl lg:text-5xl mb-6 lg:mb-8 group-hover:scale-110 transition-transform">🛡️</div>
+                    <h3 class="text-lg lg:text-xl font-black mb-4 text-emerald-500 uppercase">Fair Play</h3>
+                    <p class="text-gray-400 text-sm">Тільки твій скілл та час вирішують силу героя.</p>
+                </div>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full mb-44">
-            <div class="neon-card interactive p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">🇺🇦</div>
-                <h3 class="text-xl font-black mb-4 text-blue-500 uppercase">UA Community</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">Повне занурення в українську атмосферу Hytale.</p>
-            </div>
-            <div class="neon-card interactive p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">⚔️</div>
-                <h3 class="text-xl font-black mb-4 text-purple-500 uppercase">RPG World</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">Унікальні боси, квести та магія чекають на тебе.</p>
-            </div>
-            <div class="neon-card interactive p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">🛡️</div>
-                <h3 class="text-xl font-black mb-4 text-emerald-500 uppercase">Fair Play</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">Тільки твій скілл та час вирішують силу героя.</p>
-            </div>
-        </div>
-    </main>
+            <section class="w-full max-w-6xl mb-44 reveal px-4">
+                <h2 class="text-[10px] font-black uppercase tracking-[1em] text-blue-500 mb-10 pl-[1em]">Скріншоти нашого світу</h2>
+                <div class="slider-container">
+                    <div class="slider-btn prev" onclick="manualMove(-1)">❮</div>
+                    <div class="slider-btn next" onclick="manualMove(1)">❯</div>
+                    <div class="slider-track" id="slider">
+                        <div class="slide"><img src="screen1.png" alt="Zoria 1"></div>
+                        <div class="slide"><img src="screen2.png" alt="Zoria 2"></div>
+                        <div class="slide"><img src="screen3.png" alt="Zoria 3"></div>
+                        <div class="slide"><img src="screen4.png" alt="Zoria 4"></div>
+                        <div class="slide"><img src="screen5.png" alt="Zoria 5"></div>
+                        <div class="slide"><img src="screen6.png" alt="Zoria 6"></div>
+                        <div class="slide"><img src="screen7.png" alt="Zoria 7"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let mouseX = 0, mouseY = 0, hue = 0, trail = [], currentSlide = 0;
+
+        // ЛОГІКА СЛАЙДЕРА (7 СКРІНШОТІВ)
+        let slideInterval = setInterval(() => moveSlide(1), 8000);
+
+        function moveSlide(step) {
+            const slider = document.getElementById('slider');
+            const slides = document.querySelectorAll('.slide');
+            currentSlide = (currentSlide + step + slides.length) % slides.length;
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+
+        function manualMove(step) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            clearInterval(slideInterval);
+            moveSlide(step);
+            playSoftSwish();
+            slideInterval = setInterval(() => moveSlide(1), 10000);
+        }
+
+        window.addEventListener('mousemove', (e) => { 
+            mouseX = e.clientX; 
+            mouseY = e.clientY;
+            trail.push({x: mouseX, y: mouseY, age: 0});
+        });
+
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+
+        function playWaterDrop() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playSoftSwish() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playKeyboardThock() {
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'triangle'; osc1.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain1.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+            osc1.connect(gain1); gain1.connect(audioCtx.destination);
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine'; osc2.frequency.setValueAtTime(80, audioCtx.currentTime);
+            gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain2.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+            osc2.connect(gain2); gain2.connect(audioCtx.destination);
+            osc1.start(); osc1.stop(audioCtx.currentTime + 0.08);
+            osc2.start(); osc2.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playErrorSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playHurtSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+
         const canvas = document.getElementById('magic-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let particles = [], ambientParticles = [], stars = [];
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
 
         class Particle {
-            constructor(x, y, color, speedScale = 1, lifeSpeed = 0.02) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = (Math.random() - 0.5) * 8 * speedScale;
-                this.speedY = (Math.random() - 0.5) * 8 * speedScale;
+            constructor(x, y, color, isAmbient = false) {
+                this.x = x; this.y = y; this.color = color;
+                this.isAmbient = isAmbient;
+                this.size = isAmbient ? Math.random() * 2 : Math.random() * 3 + 1;
+                this.vx = (Math.random() - 0.5) * (isAmbient ? 0.8 : 10);
+                this.vy = (Math.random() - 0.5) * (isAmbient ? 0.8 : 10);
                 this.life = 1;
-                this.lifeSpeed = lifeSpeed;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.life -= this.lifeSpeed;
+                if (this.isAmbient) {
+                    const dx = mouseX - this.x; const dy = mouseY - this.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 150) { this.vx -= dx / 1500; this.vy -= dy / 1500; }
+                    this.x += this.vx; this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                } else { this.x += this.vx; this.y += this.vy; this.life -= 0.03; }
             }
             draw() {
                 ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.life;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.globalAlpha = this.isAmbient ? 0.2 : this.life;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
 
-        // Кліки
-        document.querySelectorAll('.interactive').forEach(elem => {
-            elem.addEventListener('click', function(e) {
-                const ripple = document.createElement('div');
-                ripple.className = 'ripple';
-                const rect = this.getBoundingClientRect();
-                ripple.style.left = `${e.clientX - rect.left}px`;
-                ripple.style.top = `${e.clientY - rect.top}px`;
-                this.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
+        for(let i=0; i<70; i++) ambientParticles.push(new Particle(Math.random()*canvas.width, Math.random()*canvas.height, '#3b82f6', true));
 
-                for(let i=0; i<25; i++) {
-                    particles.push(new Particle(e.clientX, e.clientY, '#3b82f6', 1.5, 0.03));
-                }
+        const logoImg = document.getElementById('logo-shake-btn');
+        window.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.clientX) / 40;
+            const y = (window.innerHeight / 2 - e.clientY) / 40;
+            logoImg.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
+        });
+
+        logoImg.addEventListener('click', (e) => {
+            const container = document.getElementById('shake-container');
+            container.classList.remove('apply-shake'); void container.offsetWidth; container.classList.add('apply-shake');
+            playHurtSound();
+            for(let i=0; i<25; i++) particles.push(new Particle(e.clientX, e.clientY, '#ff4444'));
+        });
+
+        document.querySelectorAll('.interactive').forEach(elem => {
+            elem.addEventListener('mouseenter', () => { if (audioCtx.state === 'suspended') audioCtx.resume(); playWaterDrop(); });
+            elem.addEventListener('click', (e) => {
+                if(elem.classList.contains('disabled-btn')) { playErrorSound(); return; }
+                if(elem.id !== 'logo-shake-btn' && !elem.classList.contains('slider-btn')) playKeyboardThock();
+                const ripple = document.createElement('div'); ripple.className = 'ripple';
+                const rect = elem.getBoundingClientRect(); ripple.style.left = `${e.clientX - rect.left}px`; ripple.style.top = `${e.clientY - rect.top}px`;
+                elem.appendChild(ripple); setTimeout(() => ripple.remove(), 600);
+                for(let i=0; i<12; i++) particles.push(new Particle(e.clientX, e.clientY, '#3b82f6'));
             });
         });
 
         function copyIp(e) {
             navigator.clipboard.writeText("zoriarpg.ggwp.cc:15510");
-            const btn = e.currentTarget;
-            const originalText = btn.innerText;
-            btn.innerText = "СКОПІЙОВАНО!";
-            btn.style.background = "#10b981";
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.style.background = "";
-            }, 2000);
+            const btn = e.currentTarget; const bar = btn.querySelector('#progress-bar');
+            btn.querySelector('span').innerText = "СКОПІЙОВАНО!"; bar.style.width = "100%";
+            setTimeout(() => { btn.querySelector('span').innerText = "КОПІЮВАТИ IP"; bar.style.width = "0"; }, 2000);
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Створення фонових іскорок (Ambient Sparks)
-            if (Math.random() > 0.85) {
-                const colors = ['#3b82f6', '#8b5cf6', '#00ffff', '#ffffff'];
-                particles.push(new Particle(
-                    Math.random() * canvas.width, 
-                    Math.random() * canvas.height, 
-                    colors[Math.floor(Math.random() * colors.length)],
-                    0.1, 0.005
-                ));
+            hue += 2;
+            if (trail.length > 1) {
+                ctx.shadowBlur = 15; ctx.lineWidth = 3; ctx.lineCap = 'round';
+                for (let i = 0; i < trail.length - 1; i++) {
+                    const p1 = trail[i], p2 = trail[i+1];
+                    ctx.strokeStyle = `hsla(${(hue + i * 5) % 360}, 100%, 50%, ${1 - p1.age/25})`;
+                    ctx.shadowColor = ctx.strokeStyle;
+                    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                    p1.age++;
+                }
+                while (trail.length > 0 && trail[0].age > 25) trail.shift();
+                ctx.shadowBlur = 0;
             }
 
+            if(Math.random() > 0.95) stars.push({x: Math.random()*canvas.width, y: 0, s: Math.random()*10+5, o: 1, len: Math.random()*80+20});
+            stars.forEach((s, i) => {
+                s.x -= s.s; s.y += s.s/2; s.o -= 0.01;
+                ctx.strokeStyle = `rgba(255,255,255,${s.o})`; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x+s.len, s.y-s.len/2); ctx.stroke();
+                if(s.o <= 0) stars.splice(i, 1);
+            });
+
+            ambientParticles.forEach(p => { p.update(); p.draw(); });
             particles = particles.filter(p => p.life > 0);
             particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animate);
         }
-        animate();
-
-        // Магічний шлейф при русі
-        window.addEventListener('mousemove', (e) => {
-            if(Math.random() > 0.8) {
-                particles.push(new Particle(e.clientX, e.clientY, 'rgba(59, 130, 246, 0.3)', 0.5, 0.02));
-            }
-        });
+        animate(); reveal();
     </script>
 </body>
 </html>
