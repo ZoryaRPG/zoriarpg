@@ -3,86 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoria RPG — Hytale Universe</title>
+    <title>Zoria RPG — Official Hytale Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #000; color: white; margin: 0; overflow-x: hidden; }
+        :root { --neon: #3b82f6; --neon-rgb: 59, 130, 246; }
+        body { font-family: 'Montserrat', sans-serif; background: #020205; color: white; margin: 0; overflow-x: hidden; cursor: crosshair; }
+
+        /* Фонова система */
+        .bg-layer { position: fixed; inset: 0; z-index: -5; background: url('fon.png') center/cover; filter: blur(8px) brightness(0.3); transform: scale(1.05); transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .vignette { position: fixed; inset: 0; z-index: -4; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.95) 100%); }
         
-        .bg-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; background-image: url('fon.png'); background-size: cover; background-position: center; filter: blur(12px); transform: scale(1.1); }
-        .bg-dimmer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: rgba(0, 0, 0, 0.45); }
-        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.95) 100%); pointer-events: none; }
+        /* Швидка та сильна пульсація логотипу */
+        @keyframes fast-pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.4)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 60px rgba(59, 130, 246, 0.8)); }
+        }
+        .hero-logo { width: 280px; animation: fast-pulse 3s ease-in-out infinite; transition: 0.5s; }
+        .hero-logo:hover { animation-play-state: paused; transform: scale(1.2); }
 
-        @keyframes rgb-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .rgb-title { font-size: clamp(3rem, 10vw, 9rem); font-weight: 900; text-transform: uppercase; background: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #3b82f6); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 4px transparent; color: #fff; animation: rgb-text 4s linear infinite; }
+        /* Заголовок: Білий з RGB-неоном */
+        .neon-title {
+            font-size: clamp(3rem, 12vw, 7.5rem);
+            font-weight: 900; color: #ffffff;
+            text-transform: uppercase; position: relative;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3); line-height: 0.9;
+        }
+        .neon-title::after {
+            content: 'ZORIA RPG';
+            position: absolute; inset: 0;
+            -webkit-text-stroke: 6px transparent;
+            background: linear-gradient(90deg, #ff0000, #00ff00, #00ffff, #ff0000, #ff00ff);
+            background-size: 250% auto;
+            -webkit-background-clip: text; background-clip: text;
+            filter: blur(6px); animation: rgb-move 3s linear infinite; z-index: -1;
+        }
+        @keyframes rgb-move { to { background-position: 250% center; } }
 
-        .logo-hero { width: 580px; max-width: 90%; animation: pulse-rgb 3.5s infinite ease-in-out; }
-        @keyframes pulse-rgb { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.4)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 50px rgba(37, 99, 235, 0.7)); } }
+        /* Інтерактивні елементи */
+        .interactive { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .interactive:active { transform: scale(0.92); }
 
-        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; transition: 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .glass-panel:hover { transform: translateY(-12px); background: rgba(255, 255, 255, 0.08); border-color: rgba(59, 130, 246, 0.4); }
-        
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 15px #10b981; }
+        .btn-main { background: var(--neon); border-radius: 18px; font-weight: 900; text-transform: uppercase; box-shadow: 0 0 20px rgba(var(--neon-rgb), 0.3); }
+        .btn-main:hover { box-shadow: 0 0 45px rgba(var(--neon-rgb), 0.7); transform: translateY(-5px) scale(1.05); }
+
+        .btn-discord { background: #5865F2; }
+        .btn-discord:hover { box-shadow: 0 0 40px rgba(88, 101, 242, 0.6); }
+
+        .neon-card {
+            background: rgba(15, 15, 25, 0.5); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 32px;
+        }
+        .neon-card:hover { border-color: var(--neon); box-shadow: 0 0 50px rgba(var(--neon-rgb), 0.2); }
+
+        /* Ефект Ripple */
+        .ripple { position: absolute; background: rgba(255, 255, 255, 0.5); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; animation: ripple-anim 0.6s ease-out; }
+        @keyframes ripple-anim { from { width: 0; height: 0; opacity: 0.6; } to { width: 600px; height: 600px; opacity: 0; } }
+
+        canvas { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <div class="bg-wrapper"></div>
-    <div class="bg-dimmer"></div>
+    <div class="bg-layer"></div>
     <div class="vignette"></div>
+    <canvas id="magic-canvas"></canvas>
 
     <nav class="w-full max-w-7xl mx-auto flex justify-between items-center p-8 z-50 relative">
-        <div class="text-2xl font-black italic uppercase tracking-tighter">ZORIA<span class="text-blue-500">RPG</span></div>
-        <a href="https://discord.gg/psWHbtjcXf" target="_blank" class="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-2xl">Discord</a>
+        <div class="text-2xl font-black italic tracking-tighter interactive cursor-default select-none">ZORIA<span class="text-blue-500">RPG</span></div>
+        <a href="https://discord.gg/psWHbtjcXf" target="_blank" class="interactive btn-discord px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest">Discord</a>
     </nav>
 
     <main class="flex flex-col items-center text-center px-4 mt-6 relative z-10">
-        <img src="logo.png" alt="Zoria Logo" class="logo-hero mb-6">
-        <h2 class="text-xl md:text-2xl font-bold uppercase tracking-[0.6em] text-blue-400 mb-2 opacity-80 italic">HYTALE УКРАЇНСЬКИЙ ПРОЕКТ</h2>
-        <h1 class="rgb-title mb-16">ZORIA RPG</h1>
+        <div class="mb-10">
+            <img src="logo.png" alt="Logo" class="hero-logo">
+        </div>
+        
+        <h2 class="text-[10px] md:text-xs font-black tracking-[1.5em] text-blue-500 mb-6 opacity-80 uppercase">Ukrainian Hytale Project</h2>
+        <h1 class="neon-title mb-24 select-none">ZORIA RPG</h1>
 
-        <div class="w-full max-w-2xl space-y-6 mb-28">
-            <div class="glass-panel p-10 flex flex-col md:flex-row justify-between items-center gap-8 px-14">
+        <div class="w-full max-w-2xl space-y-6 mb-32">
+            <div class="neon-card interactive p-10 flex flex-col md:flex-row justify-between items-center gap-8 px-14">
                 <div class="text-left">
-                    <div class="flex items-center gap-3 mb-1">
-                        <div class="status-dot"></div>
-                        <p class="text-[10px] uppercase text-white tracking-[0.2em] font-black italic">Server Status: <span class="text-green-400">Online</span></p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
+                        <p class="text-[10px] uppercase text-gray-400 tracking-[0.2em] font-black italic">Server Status: <span class="text-green-400">Online</span></p>
                     </div>
-                    <span class="text-xl md:text-2xl font-mono font-black text-white uppercase tracking-wider italic">zoriarpg.ggwp.cc:15510</span>
+                    <span class="text-xl md:text-2xl font-mono font-black text-white italic tracking-wider">zoriarpg.ggwp.cc:15510</span>
                 </div>
-                <button onclick="copyIp()" class="bg-blue-600 hover:bg-blue-500 px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl active:scale-95">КОПІЮВАТИ IP</button>
+                <button onclick="copyIp(event)" class="interactive btn-main px-10 py-5 text-xs">КОПІЮВАТИ IP</button>
             </div>
 
-            <a href="http://zoriarpg.ggwp.cc:15510/" target="_blank" class="w-full glass-panel p-6 flex items-center justify-center gap-5 hover:bg-white/5 transition-all group">
+            <a href="http://zoriarpg.ggwp.cc:15510/" target="_blank" class="interactive w-full neon-card p-6 flex items-center justify-center gap-5 group">
                 <span class="text-2xl group-hover:rotate-[360deg] transition-transform duration-1000">🌍</span>
-                <span class="text-sm font-black uppercase tracking-[0.4em]">ВІДКРИТИ ОНЛАЙН-МАПУ</span>
+                <span class="text-sm font-black uppercase tracking-[0.5em] group-hover:text-blue-400 transition-colors">Відкрити онлайн-мапу</span>
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full mb-40">
-            <div class="glass-panel p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-110 transition-transform">🇺🇦</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full mb-44">
+            <div class="neon-card interactive p-12 text-left group">
+                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">🇺🇦</div>
                 <h3 class="text-xl font-black mb-4 text-blue-500 uppercase">UA Community</h3>
                 <p class="text-gray-400 text-sm leading-relaxed">Повне занурення в українську атмосферу Hytale.</p>
             </div>
-            <div class="glass-panel p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-110 transition-transform">🛡️</div>
-                <h3 class="text-xl font-black mb-4 text-green-500 uppercase">Fair Play</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">Тільки твій скілл та час вирішують силу героя.</p>
+            <div class="neon-card interactive p-12 text-left group">
+                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">⚔️</div>
+                <h3 class="text-xl font-black mb-4 text-purple-500 uppercase">RPG World</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Унікальні боси, квести та магія чекають на тебе.</p>
             </div>
-            <div class="glass-panel p-12 text-left group">
-                <div class="text-5xl mb-8 group-hover:scale-110 transition-transform">⚔️</div>
-                <h3 class="text-xl font-black mb-4 text-orange-500 uppercase">RPG Світ</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">Унікальні боси, квести та магія чекають.</p>
+            <div class="neon-card interactive p-12 text-left group">
+                <div class="text-5xl mb-8 group-hover:scale-125 transition-transform duration-500">🛡️</div>
+                <h3 class="text-xl font-black mb-4 text-emerald-500 uppercase">Fair Play</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Тільки твій скілл та час вирішують силу героя.</p>
             </div>
         </div>
     </main>
 
     <script>
-        function copyIp() {
-            navigator.clipboard.writeText("zoriarpg.ggwp.cc:15510");
-            alert("⚔️ IP Zoria RPG скопійовано!");
+        const canvas = document.getElementById('magic-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color, speedScale = 1, lifeSpeed = 0.02) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 8 * speedScale;
+                this.speedY = (Math.random() - 0.5) * 8 * speedScale;
+                this.life = 1;
+                this.lifeSpeed = lifeSpeed;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= this.lifeSpeed;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Кліки
+        document.querySelectorAll('.interactive').forEach(elem => {
+            elem.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+
+                for(let i=0; i<25; i++) {
+                    particles.push(new Particle(e.clientX, e.clientY, '#3b82f6', 1.5, 0.03));
+                }
+            });
+        });
+
+        function copyIp(e) {
+            navigator.clipboard.writeText("zoriarpg.ggwp.cc:15510");
+            const btn = e.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "СКОПІЙОВАНО!";
+            btn.style.background = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "";
+            }, 2000);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Створення фонових іскорок (Ambient Sparks)
+            if (Math.random() > 0.85) {
+                const colors = ['#3b82f6', '#8b5cf6', '#00ffff', '#ffffff'];
+                particles.push(new Particle(
+                    Math.random() * canvas.width, 
+                    Math.random() * canvas.height, 
+                    colors[Math.floor(Math.random() * colors.length)],
+                    0.1, 0.005
+                ));
+            }
+
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Магічний шлейф при русі
+        window.addEventListener('mousemove', (e) => {
+            if(Math.random() > 0.8) {
+                particles.push(new Particle(e.clientX, e.clientY, 'rgba(59, 130, 246, 0.3)', 0.5, 0.02));
+            }
+        });
     </script>
 </body>
 </html>
